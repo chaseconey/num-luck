@@ -188,8 +188,9 @@
       const closeBtn = settingsModal.querySelector(".close");
       const settingsForm = document.getElementById("settings-form");
 
-      let GRID_SIZE = 10;
-      let MAX_GENERATED_NUMBER = 500;
+      let GRID_SIZE = parseInt(localStorage.getItem("gridSize")) || 10;
+      let MAX_GENERATED_NUMBER =
+        parseInt(localStorage.getItem("maxGeneratedNumber")) || 500;
       let grid = [];
       let currentNumber = null;
 
@@ -346,6 +347,7 @@
         settingsModal.style.display = "block";
         document.getElementById("max-number").value = MAX_GENERATED_NUMBER;
         document.getElementById("grid-size").value = GRID_SIZE;
+        updateSliderValues();
       });
 
       closeBtn.addEventListener("click", () => {
@@ -382,12 +384,31 @@
         ) {
           MAX_GENERATED_NUMBER = newMaxNumber;
           GRID_SIZE = newGridSize;
+          saveSettings(MAX_GENERATED_NUMBER, GRID_SIZE);
           initializeGame();
         }
 
         settingsModal.style.display = "none";
       });
 
+      function saveSettings(maxNumber, gridSize) {
+        localStorage.setItem("maxGeneratedNumber", maxNumber);
+        localStorage.setItem("gridSize", gridSize);
+      }
+
+      function loadSettings() {
+        const savedMaxNumber = localStorage.getItem("maxGeneratedNumber");
+        const savedGridSize = localStorage.getItem("gridSize");
+
+        if (savedMaxNumber) {
+          MAX_GENERATED_NUMBER = parseInt(savedMaxNumber);
+        }
+        if (savedGridSize) {
+          GRID_SIZE = parseInt(savedGridSize);
+        }
+      }
+
+      loadSettings();
       initializeGame();
     </script>
   </body>
