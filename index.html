@@ -108,12 +108,12 @@
         background-color: #e67e22;
       }
 
-      #settings-btn {
+      #settings-btn,
+      #how-to-play-btn {
         background-color: var(--primary-color);
         color: white;
         position: fixed;
         top: 20px;
-        left: 20px;
         z-index: 1000;
         width: auto;
         display: flex;
@@ -122,16 +122,17 @@
         padding: 12px 24px;
       }
 
-      #settings-btn:hover {
+      #settings-btn {
+        left: 20px;
+      }
+
+      #how-to-play-btn {
+        left: 100px;
+      }
+
+      #settings-btn:hover,
+      #how-to-play-btn:hover {
         background-color: #3498db;
-      }
-
-      #settings-btn .button-text {
-        margin-right: 8px;
-      }
-
-      #settings-btn .fa-cog {
-        display: none;
       }
 
       #message {
@@ -238,10 +239,8 @@
           display: none;
         }
 
-        #settings-btn {
-          position: fixed;
-          top: 20px;
-          left: 20px;
+        #settings-btn,
+        #how-to-play-btn {
           width: 40px;
           height: 40px;
           border-radius: 50%;
@@ -250,11 +249,17 @@
           color: var(--text-color);
         }
 
-        #settings-btn .button-text {
-          display: none;
+        #settings-btn {
+          left: 20px;
         }
 
-        #settings-btn .fa-cog {
+        #how-to-play-btn {
+          right: 20px;
+          left: unset;
+        }
+
+        #settings-btn .fa-cog,
+        #how-to-play-btn .fa-question {
           display: block;
           font-size: 20px;
         }
@@ -279,8 +284,10 @@
   </head>
   <body>
     <button id="settings-btn">
-      <span class="button-text">Settings</span>
       <i class="fas fa-cog"></i>
+    </button>
+    <button id="how-to-play-btn">
+      <i class="fas fa-question"></i>
     </button>
     <div id="number-range"></div>
     <h1>num-luck</h1>
@@ -325,6 +332,28 @@
       </div>
     </div>
 
+    <!-- Add this new modal for How to Play -->
+    <div id="how-to-play-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>How to Play</h2>
+        <ol>
+          <li>A random number is generated within the specified range.</li>
+          <li>
+            Click on a cell or use number keys (1-9, 0 for 10) to place the
+            number.
+          </li>
+          <li>Numbers must be placed in ascending order from left to right.</li>
+          <li>
+            The game ends when all cells are filled or no valid placement is
+            possible.
+          </li>
+          <li>Win by successfully filling all cells!</li>
+        </ol>
+        <p>Adjust the difficulty in the Settings menu.</p>
+      </div>
+    </div>
+
     <script>
       const gameContainer = document.getElementById("game-container");
       const startOverBtn = document.getElementById("start-over-btn");
@@ -335,6 +364,9 @@
       const settingsModal = document.getElementById("settings-modal");
       const closeBtn = settingsModal.querySelector(".close");
       const settingsForm = document.getElementById("settings-form");
+      const howToPlayBtn = document.getElementById("how-to-play-btn");
+      const howToPlayModal = document.getElementById("how-to-play-modal");
+      const howToPlayCloseBtn = howToPlayModal.querySelector(".close");
 
       let GRID_SIZE = parseInt(localStorage.getItem("gridSize")) || 10;
       let MAX_GENERATED_NUMBER =
@@ -555,6 +587,20 @@
           GRID_SIZE = parseInt(savedGridSize);
         }
       }
+
+      howToPlayBtn.addEventListener("click", () => {
+        howToPlayModal.style.display = "block";
+      });
+
+      howToPlayCloseBtn.addEventListener("click", () => {
+        howToPlayModal.style.display = "none";
+      });
+
+      window.addEventListener("click", (event) => {
+        if (event.target === howToPlayModal) {
+          howToPlayModal.style.display = "none";
+        }
+      });
 
       loadSettings();
       initializeGame();
