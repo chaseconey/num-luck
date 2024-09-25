@@ -58,21 +58,38 @@
         padding: 10px 20px;
         font-size: 16px;
       }
+      #number-range {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        z-index: 1000;
+      }
+
+      @media (max-width: 600px) {
+        #number-range {
+          position: static;
+          margin-bottom: 10px;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
+    <div id="number-range"></div>
     <h1>num-luck</h1>
     <div id="game-container"></div>
     <div id="generated-number"></div>
     <div id="controls">
-      <button id="generate-btn">Generate Number</button>
       <button id="start-over-btn">Start Over</button>
     </div>
     <div id="message"></div>
 
     <script>
       const gameContainer = document.getElementById("game-container");
-      const generateBtn = document.getElementById("generate-btn");
       const startOverBtn = document.getElementById("start-over-btn");
       const messageEl = document.getElementById("message");
       const generatedNumberEl = document.getElementById("generated-number");
@@ -80,6 +97,7 @@
       const MAX_GENERATED_NUMBER = 500;
       let grid = [];
       let currentNumber = null;
+      const numberRangeEl = document.getElementById("number-range");
 
       function initializeGame() {
         grid = Array(GRID_SIZE).fill(null);
@@ -93,7 +111,6 @@
         }
         messageEl.textContent = "";
         generatedNumberEl.textContent = "";
-        generateBtn.disabled = false;
         startOverBtn.style.display = "none";
         currentNumber = null;
 
@@ -102,6 +119,9 @@
 
         // Generate the first number when the game starts
         generateNumber();
+
+        // Update the number range display
+        updateNumberRange();
       }
 
       function handleKeyPress(event) {
@@ -127,7 +147,6 @@
 
       function gameOver() {
         messageEl.textContent = `Game Over! No valid placement for ${currentNumber}.`;
-        generateBtn.disabled = true;
         startOverBtn.style.display = "inline-block";
         // Disable all cells
         for (let i = 0; i < GRID_SIZE; i++) {
@@ -174,9 +193,11 @@
           currentNumber = null;
           generatedNumberEl.textContent = "";
 
+          // Update the number range display
+          updateNumberRange();
+
           if (checkWin()) {
             messageEl.textContent = "Congratulations! You won!";
-            generateBtn.disabled = true;
             startOverBtn.style.display = "inline-block";
             // Remove keyboard event listener when the game is over
             document.removeEventListener("keydown", handleKeyPress);
@@ -214,6 +235,13 @@
           }
         }
         return true;
+      }
+
+      function updateNumberRange() {
+        let minNumber = 1;
+        let maxNumber = MAX_GENERATED_NUMBER;
+
+        numberRangeEl.textContent = `Range: ${minNumber} - ${maxNumber}`;
       }
 
       startOverBtn.addEventListener("click", () => {
