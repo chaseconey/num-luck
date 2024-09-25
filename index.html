@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>num-luck</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+      h1 {
+        margin-bottom: 20px;
+      }
+      #game-container {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+      }
+      .cell {
+        width: 100px;
+        height: 30px;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        cursor: pointer;
+      }
+      .cell:hover {
+        background-color: #f0f0f0;
+      }
+      .cell.disabled {
+        cursor: not-allowed;
+        background-color: #eee;
+      }
+      #controls {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+      #message {
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      #generated-number {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      #start-over-btn {
+        display: none;
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>num-luck</h1>
+    <div id="game-container"></div>
+    <div id="generated-number"></div>
+    <div id="controls">
+      <button id="generate-btn">Generate Number</button>
+      <button id="start-over-btn">Start Over</button>
+    </div>
+    <div id="message"></div>
+
+    <script>
+      const gameContainer = document.getElementById("game-container");
+      const generateBtn = document.getElementById("generate-btn");
+      const startOverBtn = document.getElementById("start-over-btn");
+      const messageEl = document.getElementById("message");
+      const generatedNumberEl = document.getElementById("generated-number");
+      const GRID_SIZE = 10;
+      const MAX_GENERATED_NUMBER = 500;
+      let grid = [];
+      let currentNumber = null;
+
+      function initializeGame() {
+        grid = Array(GRID_SIZE).fill(null);
+        gameContainer.innerHTML = "";
+        for (let i = 0; i < GRID_SIZE; i++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.textContent = `${i + 1}.`;
+          cell.addEventListener("click", () => placeNumber(i));
+          gameContainer.appendChild(cell);
+        }
+        messageEl.textContent = "";
+        generatedNumberEl.textContent = "";
+        generateBtn.disabled = false;
+        startOverBtn.style.display = "none";
+        currentNumber = null;
+
+        // Generate the first number when the game starts
+        generateNumber();
+      }
+
+      function generateNumber() {
+        currentNumber = Math.floor(Math.random() * MAX_GENERATED_NUMBER) + 1;
+        generatedNumberEl.textContent = `Generated number: ${currentNumber}`;
+        if (!hasValidPlacement()) {
+          gameOver();
+        } else {
+          updateCellStates();
+        }
+      }
+
+      function gameOver() {
+        messageEl.textContent = `Game Over! No valid placement for ${currentNumber}.`;
+        generateBtn.disabled = true;
+        startOverBtn.style.display = "inline-block";
+        // Disable all cells
+        for (let i = 0; i < GRID_SIZE; i++) {
+          gameContainer.children[i].classList.add("disabled");
+        }
+      }
+
+      function hasValidPlacement() {
+        for (let i = 0; i < GRID_SIZE; i++) {
+          if (grid[i] === null && isValidPlacement(i)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function updateCellStates() {
+        for (let i = 0; i < GRID_SIZE; i++) {
+          const cell = gameContainer.children[i];
+          if (grid[i] !== null) {
+            cell.classList.add("disabled");
+            cell.style.backgroundColor = "";
+          } else if (currentNumber !== null && isValidPlacement(i)) {
+            cell.classList.remove("disabled");
+            cell.style.backgroundColor = "#e6ffe6"; // Set green background for all valid placements
+          } else {
+            cell.classList.add("disabled");
+            cell.style.backgroundColor = "";
+          }
+        }
+      }
+
+      function placeNumber(index) {
+        if (currentNumber === null || grid[index] !== null) return;
+
+        if (isValidPlacement(index)) {
+          grid[index] = currentNumber;
+          gameContainer.children[index].textContent = `${
+            index + 1
+          }. ${currentNumber}`;
+          gameContainer.children[index].style.backgroundColor = "";
+          currentNumber = null;
+          generatedNumberEl.textContent = "";
+
+          if (checkWin()) {
+            messageEl.textContent = "Congratulations! You won!";
+            generateBtn.disabled = true;
+            startOverBtn.style.display = "inline-block";
+          } else {
+            updateCellStates();
+            generateNumber();
+          }
+        } else {
+          messageEl.textContent = `Can't place ${currentNumber} here. It must be in ascending order.`;
+        }
+      }
+
+      function isValidPlacement(index) {
+        // Check all numbers before the current index
+        for (let i = 0; i < index; i++) {
+          if (grid[i] !== null && grid[i] >= currentNumber) {
+            return false;
+          }
+        }
+
+        // Check all numbers after the current index
+        for (let i = index + 1; i < GRID_SIZE; i++) {
+          if (grid[i] !== null && grid[i] <= currentNumber) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function checkWin() {
+        for (let i = 0; i < GRID_SIZE; i++) {
+          if (grid[i] === null) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      startOverBtn.addEventListener("click", () => {
+        initializeGame();
+      });
+
+      initializeGame();
+    </script>
+  </body>
+</html>
