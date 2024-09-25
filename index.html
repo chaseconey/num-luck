@@ -148,11 +148,29 @@
         <span class="close">&times;</span>
         <h2>Settings</h2>
         <form id="settings-form">
-          <label for="max-number">Maximum Generated Number:</label>
-          <input type="number" id="max-number" min="10" max="1000" required />
+          <label for="max-number"
+            >Maximum Generated Number: <span id="max-number-value"></span
+          ></label>
+          <input
+            type="range"
+            id="max-number"
+            min="10"
+            max="1000"
+            step="10"
+            required
+          />
 
-          <label for="grid-size">Number of Grid Cells:</label>
-          <input type="number" id="grid-size" min="5" max="20" required />
+          <label for="grid-size"
+            >Number of Grid Cells: <span id="grid-size-value"></span
+          ></label>
+          <input
+            type="range"
+            id="grid-size"
+            min="5"
+            max="20"
+            step="1"
+            required
+          />
 
           <button type="submit">Save Settings</button>
         </form>
@@ -340,14 +358,23 @@
         }
       });
 
+      const maxNumberInput = document.getElementById("max-number");
+      const maxNumberValue = document.getElementById("max-number-value");
+      const gridSizeInput = document.getElementById("grid-size");
+      const gridSizeValue = document.getElementById("grid-size-value");
+
+      function updateSliderValues() {
+        maxNumberValue.textContent = maxNumberInput.value;
+        gridSizeValue.textContent = gridSizeInput.value;
+      }
+
+      maxNumberInput.addEventListener("input", updateSliderValues);
+      gridSizeInput.addEventListener("input", updateSliderValues);
+
       settingsForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const newMaxNumber = parseInt(
-          document.getElementById("max-number").value
-        );
-        const newGridSize = parseInt(
-          document.getElementById("grid-size").value
-        );
+        const newMaxNumber = parseInt(maxNumberInput.value);
+        const newGridSize = parseInt(gridSizeInput.value);
 
         if (
           newMaxNumber !== MAX_GENERATED_NUMBER ||
