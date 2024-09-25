@@ -97,8 +97,22 @@
         startOverBtn.style.display = "none";
         currentNumber = null;
 
+        // Add event listener for keyboard input
+        document.addEventListener("keydown", handleKeyPress);
+
         // Generate the first number when the game starts
         generateNumber();
+      }
+
+      function handleKeyPress(event) {
+        if (currentNumber === null) return;
+
+        const key = event.key;
+        const index = key === "0" ? 9 : parseInt(key) - 1;
+
+        if (index >= 0 && index < GRID_SIZE) {
+          placeNumber(index);
+        }
       }
 
       function generateNumber() {
@@ -119,6 +133,8 @@
         for (let i = 0; i < GRID_SIZE; i++) {
           gameContainer.children[i].classList.add("disabled");
         }
+        // Remove keyboard event listener when the game is over
+        document.removeEventListener("keydown", handleKeyPress);
       }
 
       function hasValidPlacement() {
@@ -162,6 +178,8 @@
             messageEl.textContent = "Congratulations! You won!";
             generateBtn.disabled = true;
             startOverBtn.style.display = "inline-block";
+            // Remove keyboard event listener when the game is over
+            document.removeEventListener("keydown", handleKeyPress);
           } else {
             updateCellStates();
             generateNumber();
